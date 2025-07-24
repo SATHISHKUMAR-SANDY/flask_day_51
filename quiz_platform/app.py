@@ -19,10 +19,6 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/')
 def index():
     return redirect(url_for('login'))
@@ -85,3 +81,9 @@ def quiz():
 def results():
     latest_score = Score.query.filter_by(user_id=current_user.id).order_by(Score.id.desc()).first()
     return render_template('results.html', score=latest_score)
+
+# Create DB tables before first request manually in __main__
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)

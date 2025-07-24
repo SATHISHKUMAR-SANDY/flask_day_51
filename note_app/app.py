@@ -18,10 +18,6 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -41,7 +37,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash(f"Welcome, {current_user.username}!")
+            flash(f"Welcome, {user.username}!")
             return redirect(url_for('notes'))
         flash("Invalid credentials.")
     return render_template('login.html', form=form)
@@ -95,4 +91,6 @@ def delete_note(note_id):
     return redirect(url_for('notes'))
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

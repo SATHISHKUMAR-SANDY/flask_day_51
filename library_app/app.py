@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, session, flash, request
+from flask import Flask, render_template, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
@@ -10,14 +10,15 @@ app.config.from_object(Config)
 
 db.init_app(app)
 
-login_manager = LoginManager(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
+# ✅ Move this into a function and call it in __main__
 def create_tables():
     with app.app_context():
         db.create_all()
@@ -29,7 +30,7 @@ def create_tables():
             db.session.add(admin)
             db.session.commit()
 
-        # Add some books if none
+        # Add some books if none exist
         if not Book.query.first():
             books = ['Harry Potter', 'The Hobbit', '1984', 'To Kill a Mockingbird']
             for title in books:
@@ -99,4 +100,5 @@ def admin():
     return render_template('admin.html', records=records)
 
 if __name__ == '__main__':
-    app.run()
+    create_tables()
+    app.run(debug=True)

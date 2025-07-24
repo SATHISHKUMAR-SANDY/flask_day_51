@@ -16,10 +16,6 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -88,6 +84,10 @@ def search():
         session['last_search'] = place
         results = TravelPlan.query.filter_by(user_id=current_user.id, place=place).all()
     return render_template("search.html", form=form, results=results, last=session.get('last_search'))
+
+# Create tables safely inside app context
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)

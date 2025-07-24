@@ -19,9 +19,10 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
+# ✅ Use app context to create tables manually
 def create_tables():
-    db.create_all()
+    with app.app_context():
+        db.create_all()
 
 @app.route('/')
 def home():
@@ -47,7 +48,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash(f"Welcome back, {current_user.username}!")
+            flash(f"Welcome back, {user.username}!")
             return redirect(url_for('home'))
         flash("Invalid credentials.")
     return render_template('login.html', form=form)
@@ -70,3 +71,7 @@ def add_review():
         flash("Review submitted!")
         return redirect(url_for('home'))
     return render_template('add_review.html', form=form)
+
+if __name__ == '__main__':
+    create_tables()  # ✅ Safe table creation before running
+    app.run(debug=True)

@@ -18,10 +18,6 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -78,5 +74,8 @@ def delete_task(task_id):
     flash("Task deleted.")
     return redirect(url_for('tasks'))
 
+# ✅ Moved table creation here (safe for Flask 3+)
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
