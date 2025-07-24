@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Appointment</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.date.label }} {{ form.date() }}<br>
+    {{ form.time.label }} {{ form.time() }}<br>
+    {{ form.purpose.label }} {{ form.purpose() }}<br>
+    {{ form.submit(class="btn btn-warning mt-2") }}
+</form>
+{% endblock %}

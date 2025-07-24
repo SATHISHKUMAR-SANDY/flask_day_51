@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Threads</h2>
+<ul>
+{% for post in posts %}
+    <li><strong>{{ post.title }}</strong> [<a href="{{ url_for('post_detail', post_id=post.id) }}">View</a>]</li>
+{% endfor %}
+</ul>
+<a href="{{ url_for('forum') }}">Back to Forum</a>
+{% endblock %}

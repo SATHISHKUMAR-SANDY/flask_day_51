@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Apply for Job</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.job_title.label }} {{ form.job_title() }}<br>
+    {{ form.company.label }} {{ form.company() }}<br>
+    {{ form.cover_letter.label }} {{ form.cover_letter() }}<br>
+    {{ form.submit() }}
+</form>
+{% endblock %}

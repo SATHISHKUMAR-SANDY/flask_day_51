@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Search Travel Plans</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.place.label }} {{ form.place() }}<br><br>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+
+{% if last %}
+    <h4>Last searched: {{ last }}</h4>
+    <ul>
+        {% for plan in results %}
+            <li><strong>{{ plan.place }}</strong> on {{ plan.date }} - {{ plan.reason }}</li>
+        {% else %}
+            <p>No results found.</p>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

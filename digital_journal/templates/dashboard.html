@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Welcome {{ current_user.username }}!</h2>
+<p>Login Time: {{ login_time }}</p>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.content.label }}<br>
+    {{ form.content(cols=50, rows=4) }}<br>
+    {{ form.submit }}
+</form>
+
+<h3>Your Journal Entries:</h3>
+<ul>
+{% for entry in entries %}
+    <li>
+        {{ entry.timestamp.strftime("%Y-%m-%d %H:%M:%S") }} - {{ entry.content }}
+        [<a href="{{ url_for('edit', id=entry.id) }}">Edit</a>]
+        [<a href="{{ url_for('delete', id=entry.id) }}">Delete</a>]
+    </li>
+{% endfor %}
+</ul>
+
+<a href="{{ url_for('logout') }}">Logout</a>
+{% endblock %}

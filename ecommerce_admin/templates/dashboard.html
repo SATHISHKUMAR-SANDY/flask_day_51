@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Product Dashboard</h2>
+<a href="{{ url_for('add_product') }}">➕ Add Product</a>
+<ul>
+    {% for p in products %}
+    <li>
+        <strong>{{ p.name }}</strong> - ${{ p.price }}<br>
+        {{ p.description }}<br>
+        <a href="{{ url_for('edit_product', product_id=p.id) }}">Edit</a> |
+        <a href="{{ url_for('delete_product', product_id=p.id) }}">Delete</a>
+    </li>
+    {% else %}
+    <li>No products added yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

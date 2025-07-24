@@ -1,0 +1,22 @@
+<!-- templates/admin.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>All Borrowed Books (Admin)</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Book ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.user_id }}</td>
+            <td>{{ record.book_id }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('books') }}" class="btn btn-primary">Back</a>
+{% endblock %}

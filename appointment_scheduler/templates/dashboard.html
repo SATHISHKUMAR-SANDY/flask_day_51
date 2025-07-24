@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Welcome, {{ current_user.username }}!</h2>
+<a href="{{ url_for('book') }}" class="btn btn-success">Book Appointment</a>
+<a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+<hr>
+<h4>Your Appointments</h4>
+<ul>
+    {% for appt in appointments %}
+        <li>{{ appt.date }} at {{ appt.time }} - {{ appt.purpose }}
+            [<a href="{{ url_for('edit', id=appt.id) }}">Edit</a> |
+             <a href="{{ url_for('delete', id=appt.id) }}">Delete</a>]
+        </li>
+    {% else %}
+        <p>No appointments yet.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

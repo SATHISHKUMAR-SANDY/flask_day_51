@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Commerce Admin</title>
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+        <p>Logged in as {{ current_user.email }} | 
+           <a href="{{ url_for('dashboard') }}">Dashboard</a> | 
+           <a href="{{ url_for('logout') }}">Logout</a></p>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

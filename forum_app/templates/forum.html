@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Forum</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.title.label }} {{ form.title }}<br>
+    {{ form.content.label }}<br>
+    {{ form.content(cols=40, rows=4) }}<br>
+    {{ form.submit }}
+</form>
+
+<h3>All Posts</h3>
+<ul>
+{% for post in posts %}
+    <li>
+        <strong>{{ post.title }}</strong> by {{ post.author.username }}
+        [<a href="{{ url_for('post_detail', post_id=post.id) }}">View</a>]
+    </li>
+{% endfor %}
+</ul>
+
+<a href="{{ url_for('my_threads') }}">My Threads</a><br>
+<a href="{{ url_for('logout') }}">Logout</a>
+{% endblock %}

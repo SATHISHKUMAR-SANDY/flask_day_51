@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Submit Feedback</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.message.label }}<br>
+    {{ form.message(rows=5, cols=50) }}<br><br>
+    {{ form.submit(class="btn btn-success") }}
+</form>
+{% endblock %}

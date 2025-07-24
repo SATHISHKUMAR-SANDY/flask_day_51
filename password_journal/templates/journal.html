@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Journal Entries</h2>
+<a class="btn btn-primary mb-3" href="{{ url_for('add_entry') }}">Add New Entry</a>
+
+{% for entry in entries %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ entry.title }}</h5>
+            <p class="card-text">{{ entry.content }}</p>
+            <a href="{{ url_for('edit_entry', entry_id=entry.id) }}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm">Delete</a>
+        </div>
+    </div>
+{% else %}
+    <p>No journal entries found.</p>
+{% endfor %}
+{% endblock %}

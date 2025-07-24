@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Welcome {{ current_user.username }}</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.course.label }} {{ form.course }}<br>
+    {{ form.submit }}
+</form>
+<a href="{{ url_for('enrollments') }}">My Enrollments</a><br>
+<a href="{{ url_for('logout') }}">Logout</a>
+{% endblock %}

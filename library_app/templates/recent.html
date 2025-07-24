@@ -1,0 +1,11 @@
+<!-- templates/recent.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Recently Borrowed Books</h2>
+<ul class="list-group">
+    {% for title in books %}
+    <li class="list-group-item">{{ title }}</li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('books') }}" class="btn btn-primary mt-3">Back to Books</a>
+{% endblock %}

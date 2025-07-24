@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Your Books</h2>
+<p><a href="{{ url_for('add') }}" class="btn btn-success">Add/Update Book</a></p>
+<ul class="list-group">
+  {% for book in books %}
+    <li class="list-group-item">{{ book.title }} - {{ book.pages_read }} pages</li>
+  {% endfor %}
+</ul>
+{% if last_book %}
+  <p class="mt-3">Last viewed book: <strong>{{ last_book }}</strong></p>
+{% endif %}
+<p><a href="{{ url_for('logout') }}" class="btn btn-secondary mt-3">Logout</a></p>
+{% endblock %}

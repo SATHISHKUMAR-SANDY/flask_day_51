@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Bug Reports</h2>
+<p><strong>Last submitted title:</strong> {{ last_title }}</p>
+<ul>
+    {% for bug in bugs %}
+        <li><strong>{{ bug.title }}</strong>: {{ bug.description }}</li>
+    {% else %}
+        <li>No bugs submitted yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

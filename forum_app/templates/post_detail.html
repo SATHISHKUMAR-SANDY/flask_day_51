@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<p><i>By {{ post.author.username }} | {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</i></p>
+
+<h3>Comments:</h3>
+<ul>
+{% for c in post.comments %}
+    <li>{{ c.author.username }}: {{ c.content }}</li>
+{% endfor %}
+</ul>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.content.label }}<br>
+    {{ form.content(cols=40, rows=2) }}<br>
+    {{ form.submit }}
+</form>
+
+<a href="{{ url_for('forum') }}">Back to Forum</a>
+{% endblock %}

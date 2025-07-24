@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Log a Workout</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>{{ form.type.label }}<br>{{ form.type }}</p>
+    <p>{{ form.value.label }}<br>{{ form.value }}</p>
+    <p>{{ form.date.label }}<br>{{ form.date }}</p>
+    <p>{{ form.submit }}</p>
+</form>
+{% endblock %}

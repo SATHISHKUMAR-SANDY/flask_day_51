@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>RSVP for Event</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.event_name.label }} {{ form.event_name() }}<br>
+    {{ form.attending.label }} {{ form.attending() }}<br>
+    {{ form.submit() }}
+</form>
+{% endblock %}
