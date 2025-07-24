@@ -1,42 +1,56 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Product
-from forms import LoginForm, ProductForm
-import os
+
+from models import db, User, Review
+from forms import RegisterForm, LoginForm, ReviewForm
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///ecommerce.db')
+app.config['SECRET_KEY'] = 'your-secret-key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reviews.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
-ADMIN_EMAIL = "admin@example.com"
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
+@app.before_request
 def create_tables():
-    db.create_all()
-    if not User.query.filter_by(email=ADMIN_EMAIL).first():
-        admin = User(email=ADMIN_EMAIL, password=generate_password_hash('admin123'))
-        db.session.add(admin)
+    if not hasattr(app, 'db_initialized'):
+        db.create_all()
+        app.db_initialized = True
+
+@app.route('/')
+def home():
+    reviews = Review.query.all()
+    return render_template('home.html', reviews=reviews)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        hashed = generate_password_hash(form.password.data)
+        user = User(username=form.username.data, password=hashed)
+        db.session.add(user)
         db.session.commit()
+        flash("Registration successful.")
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash(f"Welcome, {user.email}!")  # fixed flash
-            return redirect(url_for('dashboard'))
+            flash(f"Welcome back, {current_user.username}!")
+            return redirect(url_for('home'))
         flash("Invalid credentials.")
     return render_template('login.html', form=form)
 
@@ -44,70 +58,20 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("Logged out.")
-    return redirect(url_for('login'))
+    flash("Logged out successfully.")
+    return redirect(url_for('home'))
 
-@app.route('/')
+@app.route('/add-review', methods=['GET', 'POST'])
 @login_required
-def dashboard():
-    if current_user.email != ADMIN_EMAIL:
-        flash("Access denied.")
-        return redirect(url_for('login'))
-    products = Product.query.all()
-    return render_template('dashboard.html', products=products)
-
-@app.route('/add', methods=['GET', 'POST'])
-@login_required
-def add_product():
-    if current_user.email != ADMIN_EMAIL:
-        flash("Admins only.")
-        return redirect(url_for('dashboard'))
-
-    form = ProductForm()
+def add_review():
+    form = ReviewForm()
     if form.validate_on_submit():
-        new_product = Product(
-            name=form.name.data,
-            price=form.price.data,
-            description=form.description.data
-        )
-        db.session.add(new_product)
+        review = Review(rating=form.rating.data, comment=form.comment.data, user_id=current_user.id)
+        db.session.add(review)
         db.session.commit()
-        flash("Product added successfully.")
-        return redirect(url_for('dashboard'))
-    return render_template('product_form.html', form=form, action="Add")
-
-@app.route('/edit/<int:product_id>', methods=['GET', 'POST'])
-@login_required
-def edit_product(product_id):
-    if current_user.email != ADMIN_EMAIL:
-        flash("Admins only.")
-        return redirect(url_for('dashboard'))
-
-    product = Product.query.get_or_404(product_id)
-    form = ProductForm(obj=product)
-
-    if form.validate_on_submit():
-        product.name = form.name.data
-        product.price = form.price.data
-        product.description = form.description.data
-        db.session.commit()
-        flash("Product updated.")
-        return redirect(url_for('dashboard'))
-
-    return render_template('product_form.html', form=form, action="Edit")
-
-@app.route('/delete/<int:product_id>')
-@login_required
-def delete_product(product_id):
-    if current_user.email != ADMIN_EMAIL:
-        flash("Admins only.")
-        return redirect(url_for('dashboard'))
-
-    product = Product.query.get_or_404(product_id)
-    db.session.delete(product)
-    db.session.commit()
-    flash("Product deleted.")
-    return redirect(url_for('dashboard'))
+        flash("Review submitted!")
+        return redirect(url_for('home'))
+    return render_template('add_review.html', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)
