@@ -87,7 +87,6 @@ def my_threads():
     posts = Post.query.filter_by(user_id=current_user.id).order_by(Post.timestamp.desc()).all()
     return render_template('my_threads.html', posts=posts)
 
+# ✅ Render-friendly startup — no debug, no create_all on startup
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    app.run()

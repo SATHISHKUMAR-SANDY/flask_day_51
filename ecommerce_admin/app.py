@@ -1,13 +1,13 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from models import db, User, Product
 from forms import LoginForm, ProductForm
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ecommerce.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///ecommerce.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -35,7 +35,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash("Logged in successfully.")
+            flash(f"Welcome, {user.email}!")  # fixed flash
             return redirect(url_for('dashboard'))
         flash("Invalid credentials.")
     return render_template('login.html', form=form)
@@ -108,3 +108,6 @@ def delete_product(product_id):
     db.session.commit()
     flash("Product deleted.")
     return redirect(url_for('dashboard'))
+
+if __name__ == '__main__':
+    app.run(debug=True)

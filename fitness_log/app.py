@@ -6,11 +6,16 @@ from datetime import date
 from models import db, User, Workout
 from forms import RegisterForm, LoginForm, WorkoutForm, UpdateProfileForm
 
+import os
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fitness.db'
+
+# ✅ Config
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "dev-secret-key")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///fitness.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# ✅ Init DB and LoginManager
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -23,6 +28,7 @@ def load_user(user_id):
 def create_tables():
     db.create_all()
 
+# ✅ Routes
 @app.route('/')
 def index():
     return redirect(url_for('login'))
@@ -64,7 +70,12 @@ def dashboard():
     form = WorkoutForm()
     if form.validate_on_submit():
         session['last_type'] = form.type.data
-        workout = Workout(type=form.type.data, value=form.value.data, date=form.date.data, user_id=current_user.id)
+        workout = Workout(
+            type=form.type.data,
+            value=form.value.data,
+            date=form.date.data,
+            user_id=current_user.id
+        )
         db.session.add(workout)
         db.session.commit()
         flash("Workout logged!")
@@ -93,5 +104,6 @@ def profile():
             flash("Incorrect current password.")
     return render_template('profile.html', form=form)
 
+# ✅ Needed for Render deployment
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))

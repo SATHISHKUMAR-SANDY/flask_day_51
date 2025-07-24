@@ -7,6 +7,7 @@ from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 db.init_app(app)
 
 login_manager = LoginManager(app)
@@ -16,8 +17,8 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
+# ✅ FIXED: create tables & admin user inside app context instead of @before_first_request
+with app.app_context():
     db.create_all()
     if not User.query.filter_by(username='admin').first():
         admin = User(username='admin')

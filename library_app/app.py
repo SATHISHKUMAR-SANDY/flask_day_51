@@ -19,19 +19,22 @@ def load_user(user_id):
 
 @app.before_first_request
 def create_tables():
-    db.create_all()
-    # Add default admin user if not exists
-    if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin', is_admin=True)
-        admin.set_password('admin123')
-        db.session.add(admin)
-        db.session.commit()
-    # Add some books if none
-    if not Book.query.first():
-        books = ['Harry Potter', 'The Hobbit', '1984', 'To Kill a Mockingbird']
-        for title in books:
-            db.session.add(Book(title=title))
-        db.session.commit()
+    with app.app_context():
+        db.create_all()
+
+        # Add default admin user if not exists
+        if not User.query.filter_by(username='admin').first():
+            admin = User(username='admin', is_admin=True)
+            admin.set_password('admin123')
+            db.session.add(admin)
+            db.session.commit()
+
+        # Add some books if none
+        if not Book.query.first():
+            books = ['Harry Potter', 'The Hobbit', '1984', 'To Kill a Mockingbird']
+            for title in books:
+                db.session.add(Book(title=title))
+            db.session.commit()
 
 @app.route('/')
 def home():
@@ -94,6 +97,6 @@ def admin():
         return redirect(url_for('books'))
     records = BorrowedBook.query.all()
     return render_template('admin.html', records=records)
-    
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

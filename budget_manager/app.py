@@ -18,8 +18,8 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
+# ✅ Instead of @app.before_first_request
+with app.app_context():
     db.create_all()
 
 @app.route('/')
@@ -45,7 +45,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash(f"Welcome, {current_user.username}!")
+            flash(f"Welcome, {user.username}!")
             return redirect(url_for('dashboard'))
         flash("Invalid credentials.")
     return render_template('login.html', form=form)
@@ -69,9 +69,11 @@ def dashboard():
         return redirect(url_for('dashboard'))
 
     if expense_form.validate_on_submit():
-        expense = Expense(category=expense_form.category.data,
-                          amount=expense_form.amount.data,
-                          user_id=current_user.id)
+        expense = Expense(
+            category=expense_form.category.data,
+            amount=expense_form.amount.data,
+            user_id=current_user.id
+        )
         db.session.add(expense)
         db.session.commit()
 
@@ -94,3 +96,6 @@ def summary():
     expenses = Expense.query.filter_by(user_id=current_user.id).all()
     total = sum(e.amount for e in expenses)
     return render_template('summary.html', expenses=expenses, total=total)
+
+if __name__ == '__main__':
+    app.run(debug=True)

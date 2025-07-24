@@ -18,8 +18,8 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
+# ✅ FIX: Use app context instead of @app.before_first_request
+with app.app_context():
     db.create_all()
 
 @app.route('/')
