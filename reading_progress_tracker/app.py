@@ -7,15 +7,18 @@ from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
-db.init_app(app)
 
+# Initialize DB and Login Manager
+db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# User loader for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Login Route
 @app.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -28,6 +31,7 @@ def login():
         flash("Invalid credentials", "danger")
     return render_template("login.html", form=form)
 
+# Logout Route
 @app.route('/logout')
 @login_required
 def logout():
@@ -36,6 +40,7 @@ def logout():
     flash("You’ve been logged out.", "info")
     return redirect(url_for('login'))
 
+# Dashboard Route
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -43,6 +48,7 @@ def dashboard():
     last_book = session.get('last_book')
     return render_template("dashboard.html", books=books, last_book=last_book)
 
+# Add / Update Book Route
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
@@ -64,10 +70,11 @@ def add():
         return redirect(url_for('dashboard'))
     return render_template("add_book.html", form=form)
 
-# ✅ Move table creation here instead of @app.before_first_request
+# Create tables and admin user before first request
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        # Create default admin if not exists
         if not User.query.filter_by(username='admin').first():
             admin = User(username='admin')
             admin.set_password('admin123')
