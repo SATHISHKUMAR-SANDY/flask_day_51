@@ -2,10 +2,8 @@ from flask import Flask, render_template, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
-
 from models import db, User, Workout
 from forms import RegisterForm, LoginForm, WorkoutForm, UpdateProfileForm
-
 import os
 
 app = Flask(__name__)
@@ -24,9 +22,13 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
+# ✅ Moved to run inside context
+@app.before_request
+def create_tables_if_needed():
+    if not hasattr(app, '_tables_created'):
+        with app.app_context():
+            db.create_all()
+            app._tables_created = True
 
 # ✅ Routes
 @app.route('/')
@@ -104,6 +106,6 @@ def profile():
             flash("Incorrect current password.")
     return render_template('profile.html', form=form)
 
-# ✅ Needed for Render deployment
+# ✅ Entry point for local or Render deployment
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
