@@ -19,11 +19,7 @@ def load_user(user_id):
 @app.before_first_request
 def create_tables():
     db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin')
-        admin.set_password('admin123')
-        db.session.add(admin)
-        db.session.commit()
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
